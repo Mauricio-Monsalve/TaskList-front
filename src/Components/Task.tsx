@@ -2,6 +2,10 @@ import { useState } from "react";
 import { useTask } from "../Contexts/TaskContext";
 import type { TaskType } from "../types";
 
+import trash from "/icons/trash.svg"
+import check from "/icons/check.svg"
+import copy from "/icons/copy.svg"
+
 interface CheckBoxProps {
   completeHook: {
     completada: boolean;
@@ -19,7 +23,7 @@ const CheckBox = ({
     >
       {completada && (
         <img
-          src="/icons/check.svg"
+          src={check}
           alt="check"
           className="w-full bg-blue-300"
         />
@@ -71,14 +75,14 @@ function Task({ tareaProp }: TaskProps) {
         className="w-10 p-1 aspect-square cursor-pointer bg-blue-100 border-2 border-blue-300 flex justify-center items-center rounded-md select-none"
         onClick={() => deleteTask(id)}
       >
-        <img src="/icons/trash.svg" className="w-full" alt="borrar" />
+        <img src={trash} className="w-full" alt="borrar" />
       </button>
       <button
         type="button"
         className="w-10 p-1 aspect-square cursor-pointer bg-blue-100 border-2 border-blue-300 flex justify-center items-center rounded md select-none"
         onClick={copyTask}
       >
-        <img src="/icons/copy.svg" className="w-full" alt="copiar" />
+        <img src={copy} className="w-full" alt="copiar" />
       </button>
     </div>
   );
