@@ -19,7 +19,6 @@ function Form() {
 
   const onSubmit = handleSubmit((data) => {
     addTask(data);
-    alert("Tarea agregada con éxito");
     turnViewForm();
   });
 

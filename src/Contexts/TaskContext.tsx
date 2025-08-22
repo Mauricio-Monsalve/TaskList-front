@@ -1,12 +1,17 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { TaskType } from '../types';
+// import {config} from 'dotenv'
+// import process from 'node:process';
+
+// config()
+// npm i -D @types/node
 
 interface TaskContextType {
   tasks: TaskType[];
-  addTask: (task: Omit<TaskType, 'id' | 'completada' | 'borrada'>) => Promise<void>;
-  checkTask: (id: number) => Promise<void>;
-  deleteTask: (id: number) => Promise<void>;
+  addTask: (task: Omit<TaskType, '_id' | 'completada'>) => Promise<void>;
+  checkTask: (_id: string) => Promise<void>;
+  deleteTask: (_id: string) => Promise<void>;
 }
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
@@ -16,7 +21,7 @@ function TaskProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     async function fetchTasks() {
-      const response = await fetch('http://localhost:3000/task');
+      const response = await fetch(import.meta.env.VITE_API+'/task');
       const loadedTasks = await response.json() as TaskType[];
       // const loadedTasks = await getTasks();
       setTasks(loadedTasks);
@@ -27,7 +32,7 @@ function TaskProvider({ children }: { children: ReactNode }) {
   const addTask: TaskContextType['addTask'] = async (task) => {
     
     try {
-      const response = await fetch('http://localhost:3000/task',{
+      const response = await fetch(import.meta.env.VITE_API+'/task',{
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -37,6 +42,8 @@ function TaskProvider({ children }: { children: ReactNode }) {
       const newTask = await response.json() as TaskType
   
       const updatedTasks = [...tasks, newTask]
+      
+      alert("Tarea agregada con éxito");
       setTasks(updatedTasks)
     } catch (error) {
       console.error(error)
@@ -55,20 +62,31 @@ function TaskProvider({ children }: { children: ReactNode }) {
     // await saveTasks(updatedTasks);
   };
 
-  const checkTask: TaskContextType['checkTask'] = async (id) => {
+  const checkTask: TaskContextType['checkTask'] = async (_id) => {
 
     try {
-      const response = await fetch(`http://localhost:3000/task/${id}`,{
+      const response = await fetch(import.meta.env.VITE_API+'/task/'+_id,{
         headers: {
           'Content-Type': 'application/json'
         },
         method: 'PATCH'
       })
-      const checkedTask = await response.json() as TaskType
+      const checkedTask = await response.json() as Pick<TaskType,'_id' | 'completada'>
+      
+      const updatedTasks = [...tasks]
+      const searchTaskIndex = updatedTasks.findIndex( task => task._id == checkedTask._id )
+
+      if ( searchTaskIndex == -1 ) {
+        throw new Error('Error al marcar la tarea')
+      }
+
+      updatedTasks[searchTaskIndex].completada = checkedTask.completada
+
+      setTasks(updatedTasks)
+
+      // const updatedTask = tasks.map(task => task._id == checkedTask._id ? checkedTask : task)
   
-      const updatedTask = tasks.map(task => task.id == checkedTask.id ? checkedTask : task)
-  
-      setTasks(updatedTask)
+      // setTasks(updatedTask)
     } catch (error) {
       console.error(error)
       alert('Error al marcar la tarea')
@@ -83,15 +101,15 @@ function TaskProvider({ children }: { children: ReactNode }) {
     // await saveTasks(updatedTasks);
   };
 
-  const deleteTask: TaskContextType['deleteTask'] = async (id) => {
-
+  const deleteTask: TaskContextType['deleteTask'] = async (_id) => {
+    console.log(_id)
     try {
-      const response = await fetch(`http://localhost:3000/task/${id}`,{
+      const response = await fetch(import.meta.env.VITE_API+'/task/'+_id,{
         method: 'DELETE'
       })
-      const tareaBorrada = await response.json() as TaskType
+      const tareaBorrada = await response.json() as Pick<TaskType, '_id'>
 
-      const updatedTask = tasks.filter( tarea => tarea.id !== tareaBorrada.id )
+      const updatedTask = tasks.filter( tarea => tarea._id !== tareaBorrada._id )
 
       setTasks(updatedTask)
 

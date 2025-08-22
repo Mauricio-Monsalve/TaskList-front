@@ -37,7 +37,7 @@ interface TaskProps {
 };
 
 function Task({ tareaProp }: TaskProps) {
-  const { titulo, descripcion, completada, id } = tareaProp;
+  const { titulo, descripcion, completada, _id: id } = tareaProp;
   const [more, setMore] = useState(false);
   const { checkTask, deleteTask } = useTask();
 

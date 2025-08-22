@@ -1,7 +1,6 @@
 export interface TaskType {
-  id: number;
+  _id: string;
   titulo: string;
   descripcion: string;
   completada: boolean;
-  borrada: boolean;
 }
